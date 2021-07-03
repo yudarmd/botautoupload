@@ -1,0 +1,22 @@
+{
+  "name": "bot-auto-upload",
+  "version": "1.0.0",
+  "description": "bot auto upload by YudaRmd",
+  "main": "",
+  "dependencies": {
+    "figlet": "^1.5.0",
+    "line-reader": "^0.4.0",
+    "n-readlines": "^1.0.1",
+    "puppeteer": "^10.0.0",
+    "puppeteer-extra": "^3.1.18",
+    "puppeteer-extra-plugin-stealth": "^2.7.8",
+    "read-excel-file": "^5.2.4",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
