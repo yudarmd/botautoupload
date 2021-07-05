@@ -1,29 +1,87 @@
 const puppeteer = require('puppeteer');
 const fs = require("fs");
 const lineByLine = require('n-readlines');
-const readline = require('readline').createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+const readlineSync = require('readline-sync');
+const figlet = require('figlet');
 
+const cookiesFilePath = __dirname+'/kaskus/cookies.json';
+const cookiesString = fs.readFileSync(cookiesFilePath);
 
-const initBrowser = async () =>{
+(async () => {
   const browser = await puppeteer.launch({
-    // headless: false,
-    defaultViewport: null
+    headless: false,
+    defaultViewport: null,
+    args: ['--start-maximized']
   });
-  return browser;
-};
-
-const initNewPage = async (browser) =>{
   const page = await browser.newPage();
-  return page;
+  var email = null;
+  var password = null;
+  var caption = '';
+  var line;
+  const $options = {waitUntil:'networkidle2'};
+  const dataBlasting = new lineByLine(__dirname + '/kaskus/dataBlasting.txt');
+
+  await page.setViewport({"width": 0,"height": 0});
+
+  const lineDesc = new lineByLine(__dirname + '/kaskus/caption.txt');
+
+  while (captResult = lineDesc.next()) {
+      caption += captResult.toString();
+  }
+
+  console.log(figlet.textSync('Tools Kaskus', {horizontalLayout: 'fitted'}));
+  console.log('                                                            by YudaRmd\n');
+
+  await login(page,$options,email,password);
+  var row = 0;
+  while (line = dataBlasting.next()) {
+    const lineString = line.toString();
+    const data = lineString.split('|');
+    const img = data[0];
+    const title = data[1];
+    const desc = data[2];
+    const price = data[3];
+    const tag = data[4];
+
+    await uploadIklan(page,$options,browser,img,title,desc,price,caption,tag);
+    console.log('Iklan berhasil di upload: '+title)
+  }
+  await browser.close();
+
+})();
+
+const login = async(page,$options,email,password) =>{
+  if (cookiesString.length == 0) {
+    console.log('Login Ke kaskus');
+    email = readlineSync.question('Email : ');
+    password = readlineSync.question('Password : ', {
+      hideEchoBack: true
+    });
+
+    await inputLogin(page,$options,email,password);
+  }else{
+    var gantiAkun = readlineSync.question('Anda Sudah Login. Apakah Anda ingin Ganti Akun (Y/N) : ');
+
+    if (gantiAkun == "Y" || gantiAkun == "y") {
+      email = readlineSync.question('Email : ');
+      password = readlineSync.question('Password : ', {
+        hideEchoBack: true
+      });
+      await inputLogin(page,$options,email,password);
+    }else{
+      const parsedCookies = JSON.parse(cookiesString);
+      if (parsedCookies.length !== 0) {
+          for (let cookie of parsedCookies) {
+            await page.setCookie(cookie);
+        }
+      }
+    }
+  }
 }
 
-const login = async (page,email,password) =>{
+const inputLogin = async(page,$options,email,password) =>{
   await page.setDefaultNavigationTimeout(0); 
-  await page.goto('https://www.kaskus.co.id/');
-  await page.waitForTimeout(2000);
+  await page.goto('https://www.kaskus.co.id/',$options);
   await page.waitForSelector('[data-modal="jsModalSignin"]');
   await page.click('[data-modal="jsModalSignin"]');
   await page.waitForSelector('#username');
@@ -31,49 +89,70 @@ const login = async (page,email,password) =>{
   await page.waitForSelector('#password');
   await page.type('#password', password,{delay:10});
   await page.click('[value="Masuk"]');
-  await page.waitForTimeout(2000);
+
+  await page.waitForTimeout(3000);
+  const cookiesObject = await page.cookies();
+
+  fs.writeFile(cookiesFilePath, JSON.stringify(cookiesObject),
+  function(err) { 
+      if (err) {
+      console.log('The file could not be written.', err)
+      }
+      // console.log('Session has been successfully saved')
+  });
 }
 
-const inputIklan = async (page,browser,img,judul,desc,harga,caption,tag) =>{
+const uploadIklan = async (page,$options,browser,img,title,desc,price,caption,tag) =>{
   await page.setDefaultNavigationTimeout(0); 
-  await page.goto('https://fjb.kaskus.co.id/sell');
-  await page.waitForTimeout(1000);
+  await page.goto('https://fjb.kaskus.co.id/sell',$options);
+
   await page.waitForSelector('#maincategory');
-  await page.select('#maincategory','202');
-  await page.waitForTimeout(1000);
+    const selectCategory = await page.$('#maincategory');
+        await selectCategory.select('202');
+        await selectCategory.dispose();
+
   await page.waitForSelector('#subcategory-0');
-  await page.select('#subcategory-0','885');
-  await page.waitForTimeout(1000);
+    const selectSubCategory = await page.$('#subcategory-0');
+        await selectSubCategory.select('885');
+        await selectSubCategory.dispose();
+
   await page.waitForSelector('#title');
-  await page.type('#title', judul);
-  await page.waitForTimeout(500);
+  const titleField = await page.$('#title');
+      await titleField.type(title);
+      await titleField.dispose();
+
   await page.waitForSelector('#formatted_price');
-  await page.type('#formatted_price', harga);
-  await page.waitForTimeout(500);
+  const priceField = await page.$('#formatted_price');
+      await priceField.type(price);
+      await priceField.dispose();
+
   await page.waitForSelector('#location');
-  await page.select('#location','11');
-  await page.waitForTimeout(1500);
+  const locationField = await page.$('#location');
+      await locationField.select('11');
+      await locationField.dispose();
+
   await page.waitForSelector('#fjb-description-editor');
-  await page.type('#fjb-description-editor', desc + caption);
-  await page.waitForTimeout(2000);
+  const descriptionField = await page.$('#fjb-description-editor');
+      await descriptionField.type(desc + caption);
+      await descriptionField.dispose();
+
   await page.waitForSelector('#upload-image-1');
   const [fileChooser] = await Promise.all([
     page.waitForFileChooser(),
     page.click('#upload-image-1')
   ]);
+
   await fileChooser.accept(['./kaskus/img/'+img]).then(() => {}).catch(async(err) => {
     console.log('Gambar harus .jpg atau Gambar tidak tersedia. Silahkan cek kembali!');
     await browser.close();
   });
-  await page.waitForTimeout(500);
+
+  await page.waitForTimeout(5000);
   await page.waitForSelector('#tag');
-  await page.type('#tag', tag);
-  // await page.waitForTimeout(1000);
-  // await page.waitForSelector('#button-submit');
-  // await page.click('#button-submit');
-  // await page.waitForTimeout(1000);
-  // await page.waitForSelector('#sundul_message');
-  // await page.click('#sundul_message');
+  const tagField = await page.$('#tag');
+      await tagField.type(tag);
+      await tagField.dispose();
+      
   await page.waitForNavigation();
   await page.waitForTimeout(3000);
   const content = await page.evaluate(() => location.href) + "\n";
@@ -84,52 +163,3 @@ const inputIklan = async (page,browser,img,judul,desc,harga,caption,tag) =>{
     }
   });
 }
-
-const liner = new lineByLine(__dirname + '/kaskus/dataBlasting.txt');
-const lineDesc = new lineByLine(__dirname + '/kaskus/caption.txt');
-
-(async () => {
-    let line;
-    let descResult;
-    let caption ="";
-    let email ="";
-    let password ="";
-
-    const browser = await initBrowser();
-    const page = await initNewPage(browser);
-
-    while (descResult = lineDesc.next()) {
-        caption += descResult.toString();
-    }
-    console.log('Auto Upload Kaskus by YudaRmd');
-    readline.question('Email : ', inputEmail => {
-      email += inputEmail;
-        readline.question('Password : ', inputPassword => {
-          password += inputPassword;
-          readline.close();
-        });
-    });
-
-    readline.on("close", async() => {
-      await login(page,email,password).then(() => {
-        console.log('login berhasil ke akun '+email);
-      }).catch(async(err) => {
-        console.log('login gagal');
-        // await browser.close();
-      });
-
-      while (line = liner.next()) {
-        const lineString = line.toString();
-        const data = lineString.split('|');
-        const img = data[0];
-        const judul = data[1];
-        const desc = data[2];
-        const harga = data[3];
-        const tag = data[4];
-        await inputIklan(page,browser,img,judul,desc,harga,caption,tag);
-        console.log('Iklan berhasil di upload: '+judul);
-      }
-
-      await browser.close();
-    });
-})();
