@@ -9,7 +9,7 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
 
 (async () => {
   const browser = await puppeteer.launch({
-    headless: false,
+    // headless: false,
     defaultViewport: null,
     args: ['--start-maximized']
   });
@@ -32,8 +32,10 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
   console.log(figlet.textSync('Tools Kaskus', {horizontalLayout: 'fitted'}));
   console.log('                                                            by YudaRmd\n');
 
-  await login(page,$options,email,password);
-  var row = 0;
+  await login(page,$options,email,password).then(() => {console.log("Login Berhasil")}).catch(async(err) => {
+    console.log('Login Gagal');
+  });
+
   while (line = dataBlasting.next()) {
     const lineString = line.toString();
     const data = lineString.split('|');
@@ -43,8 +45,12 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
     const price = data[3];
     const tag = data[4];
 
-    await uploadIklan(page,$options,browser,img,title,desc,price,caption,tag);
-    console.log('Iklan berhasil di upload: '+title)
+    await uploadIklan(page,$options,browser,img,title,desc,price,caption,tag).then(() => {
+          return console.log('Iklan Berhasil Diupload: '+title);
+      })
+      .catch((err) => {
+          return console.log('Iklan Gagal Diupload: '+title);
+      })
   }
   await browser.close();
 
@@ -147,14 +153,14 @@ const uploadIklan = async (page,$options,browser,img,title,desc,price,caption,ta
     await browser.close();
   });
 
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(3000);
   await page.waitForSelector('#tag');
   const tagField = await page.$('#tag');
       await tagField.type(tag);
       await tagField.dispose();
       
   await page.waitForNavigation();
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(8000);
   const content = await page.evaluate(() => location.href) + "\n";
   fs.appendFile(__dirname +'/kaskus/hasil.txt', content, err => {
     if (err) {

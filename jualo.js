@@ -32,8 +32,10 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
   console.log(figlet.textSync('Tools Jualo', {horizontalLayout: 'fitted'}));
   console.log('                                                            by YudaRmd\n');
 
-  await login(page,$options,email,password);
-  var row = 0;
+  await login(page,$options,email,password).then(() => {console.log("Login Berhasil")}).catch(async(err) => {
+    console.log('Login Gagal');
+  });
+
   while (line = dataBlasting.next()) {
     const lineString = line.toString();
     const data = lineString.split('|');
@@ -41,9 +43,12 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
     const title = data[1];
     const desc = data[2];
     const price = data[3];
-    row += 1;
-    await uploadIklan(page,$options,browser,img,title,desc,price,caption,row);
-    console.log('Iklan berhasil di upload: '+title)
+    await uploadIklan(page,$options,browser,img,title,desc,price,caption).then(() => {
+        return console.log('Iklan Berhasil Diupload: '+title);
+    })
+    .catch((err) => {
+        return console.log('Iklan Gagal Diupload: '+title);
+    })
   }
   await browser.close();
 
@@ -124,6 +129,7 @@ const uploadIklan = async (page,$options,browser,img,title,desc,price,caption,ro
     await page.setDefaultNavigationTimeout(0); 
     await page.goto('https://www.jualo.com/iklan/pasang-iklan-gratis',$options);
 
+    await page.waitForTimeout(3000);
     await page.waitForSelector('#fileupload');
     const [fileChooser] = await Promise.all([
       page.waitForFileChooser(),
@@ -135,6 +141,7 @@ const uploadIklan = async (page,$options,browser,img,title,desc,price,caption,ro
       await browser.close();
     });
 
+    await page.waitForTimeout(2000);
     await page.waitForSelector('#ad_ad_name');
     const inputTitle = await page.$('#ad_ad_name');
         await inputTitle.type(title);
@@ -164,6 +171,7 @@ const uploadIklan = async (page,$options,browser,img,title,desc,price,caption,ro
         await selectSubSubCategory.click();
         await selectSubSubCategory.dispose();
 
+    await page.waitForTimeout(2000);
     await page.waitForSelector('#ad_ad_type_id_1');
     await page.evaluate(() => {
       document.querySelector('#ad_ad_type_id_1').click();
@@ -175,6 +183,7 @@ const uploadIklan = async (page,$options,browser,img,title,desc,price,caption,ro
         await inputDesc.type(desc + caption);
         await inputDesc.dispose();
 
+    await page.waitForTimeout(1000);
     await page.waitForSelector('#ad_price');
     const inputPrice = await page.$('#ad_price');
         await inputPrice.type(price);
@@ -195,7 +204,7 @@ const uploadIklan = async (page,$options,browser,img,title,desc,price,caption,ro
     page.on('dialog', async (dialog) => {
       await dialog. accept().then(() => {}).catch((err) => {});
     });
-    ` `
+    
     await page.waitForTimeout(1000);
     await page.waitForSelector('#submit_button');
     const btnSubmit = await page.$('#submit_button');
@@ -203,6 +212,7 @@ const uploadIklan = async (page,$options,browser,img,title,desc,price,caption,ro
         await btnSubmit.dispose();
 
     await page.waitForNavigation();
+    await page.waitForTimeout(3000);
     const arrayLink = await page.evaluate(
       () => Array.from(
         document.querySelectorAll('body > div.pasang-iklan-success > div.success-info-section > a.button-left'),

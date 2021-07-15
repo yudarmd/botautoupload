@@ -8,7 +8,7 @@ const cookiesFilePath = __dirname+'/pinterest/cookies.json';
 const cookiesString = fs.readFileSync(cookiesFilePath);
 (async () => {
     const browser = await await puppeteer.launch({
-      // headless: false,
+      //headless: false,
       defaultViewport: null
     });
     const page = await browser.newPage();
@@ -22,7 +22,9 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
     console.log(figlet.textSync('Tools Pinterest', {horizontalLayout: 'fitted'}));
     console.log('                                                                   by YudaRmd\n');
 
-    await login(page,$options,email,password)
+    await login(page,$options,email,password).then(() => {console.log("Login Berhasil")}).catch(async(err) => {
+      console.log('Login Gagal');
+    });
 
     const lineCaption = new lineByLine(__dirname + '/pinterest/caption.txt');
 
@@ -38,8 +40,18 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
       const desc = data[2];
       const link = data[3];
       const category = data[4];
-      await uploadPin(page,$options,img,title,caption,desc,link,category);
-      console.log('Iklan berhasil di upload: '+title);
+      await uploadPin(page,$options,img,title,caption,desc,link,category).then(() => {
+          return console.log('\x1b[32m%s\x1b[0m','Iklan Berhasil Diupload: '+title);
+      })
+      .catch((err) => {
+          return console.log('\x1b[31m%s\x1b[0m','Iklan Gagal Diupload: '+title);
+      })
+      fs.appendFile(__dirname +'/pinterest/hasil.txt', "\n", err => {
+        if (err) {
+          console.error(err);
+          return
+        }
+      });
     }
 
     await browser.close();
@@ -156,7 +168,7 @@ const uploadPin = async(page,$options,img,title,caption,desc,link,category) =>{
     await btnSeeItNow.dispose();
 
     await page.waitForTimeout(3000);
-    const content = await page.evaluate(() => location.href) + "\n";
+    const content = await page.evaluate(() => location.href);
     fs.appendFile(__dirname +'/pinterest/hasil.txt', content, err => {
       if (err) {
         console.error(err);

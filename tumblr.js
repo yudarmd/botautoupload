@@ -20,7 +20,7 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
     const dataBlasting = new lineByLine(__dirname + '/tumblr/dataBlasting.txt');
 
     console.log(figlet.textSync('Tools Tumblr', {horizontalLayout: 'fitted'}));
-    console.log('                                                                   by YudaRmd\n');
+    console.log('                                                             by YudaRmd\n');
 
     await login(page,$options,email,password);
 
@@ -112,10 +112,12 @@ const inputLogin = async(page,$options,email,password) =>{
 const uploadPost = async(page,$options,title,img,caption,desc,tag) =>{
     await page.waitForTimeout(2000);
     await page.goto('https://www.tumblr.com/new/text',$options)
-    await page.waitForSelector('div > div > div > div > div.DraftEditor-editorContainer > div > div > div');
-    const btnTitle = await page.$('div > div > div > div > div.DraftEditor-editorContainer > div > div > div');
-    await btnTitle.click();
-    await btnTitle.dispose();
+
+    // await page.waitForTimeout(3000);
+    // await page.waitForSelector('div.editor.editor-plaintext');
+    // const btnTitle = await page.$('div.editor.editor-plaintext');
+    // await btnTitle.click();
+    // await btnTitle.dispose();
     
     // await page.waitForSelector('div > div > div > div > div.DraftEditor-editorContainer > div > div > div');
     // const typeTitle = await page.$('div > div > div > div > div.DraftEditor-editorContainer > div > div > div');
@@ -123,19 +125,18 @@ const uploadPost = async(page,$options,title,img,caption,desc,tag) =>{
     // await typeTitle.dispose();
     await page.waitForTimeout(2000);
 
-    await page.keyboard.type(title);
-    await page.keyboard.press("Tab");
 
-    await page.waitForSelector('div > div > div > div.DR-8X > div._1RnRi > button._1F1cG._2SgM1._10_K8 > span > svg');
+    
+    await page.waitForSelector('div.editor-wrapper > div > div.inline-controls > div.tray > div.control.add-image > input[type=file]');
     const [fileChooser] = await Promise.all([
       page.waitForFileChooser(),
-      page.click('div > div > div > div.DR-8X > div._1RnRi > button._1F1cG._2SgM1._10_K8 > span > svg')
+      page.click('div.editor-wrapper > div > div.inline-controls > div.tray > div.control.add-image > input[type=file]')
     ]);
     
     await fileChooser.accept(['./tumblr/img/'+img]);
-
+    
     await page.waitForTimeout(2000);
-
+    
     await page.keyboard.type(desc);
     await page.waitForTimeout(2000);
     await page.keyboard.type(caption);
@@ -149,6 +150,9 @@ const uploadPost = async(page,$options,title,img,caption,desc,tag) =>{
     const typeTag = await page.$('div._2UPya > div > span > span > textarea');
     await typeTag.type(tag);
     await typeTag.dispose();
+
+    await page.keyboard.press("Tab");
+    await page.keyboard.type(title);
 
     await page.waitForTimeout(2000);
     await page.waitForSelector('button._1F1cG.dE0It');
