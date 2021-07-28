@@ -23,7 +23,18 @@ silahkan download node js di link berikut https://nodejs.org/en/
 
 Silahkan Clone Repository ini kemudian masuk ke CMD
 
-## 3. Jalankan Script
+## 3. Melengkapi Data Upload
+
+Format Data Blasting
+1. Auto Upload Blog         : Title|Link Article|Label|Date|Time|Permalink
+2. Auto Upload Fanspage     : Image|Link|Description
+3. Auto Upload Jualo        : Image|Title|Description|Price
+4. Auto Upload Kaskus       : Image|Title|Description|Price|Tag
+5. Auto Upload Pinterest    : Image|Title|Description|Link|Category
+6. Auto Upload Tumblr       : Image|Title|Description|Tag
+7. Auto Upload Youtube      : Video|Title|Description
+
+## 4. Jalankan Script
 
 Cara menjalankan scriptnya dengan cara
 1. Masuk ke CMD sesuai directory

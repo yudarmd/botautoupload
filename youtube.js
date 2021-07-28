@@ -117,6 +117,7 @@ const inputLogin = async(page,$options,email,password) =>{
 }
 
 const uploadPin = async(page,$options,video,title,caption,desc) =>{
+  await page.setDefaultNavigationTimeout(0);
   await page.goto("https://studio.youtube.com/",$options);
 
   await page.waitForSelector('#create-icon');

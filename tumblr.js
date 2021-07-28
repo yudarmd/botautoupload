@@ -3,6 +3,7 @@ const fs = require("fs");
 const lineByLine = require('n-readlines');
 const readlineSync = require('readline-sync');
 const figlet = require('figlet');
+const clipboardy = require('clipboardy');
 
 const cookiesFilePath = __dirname+'/tumblr/cookies.json';
 const cookiesString = fs.readFileSync(cookiesFilePath);
@@ -22,7 +23,9 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
     console.log(figlet.textSync('Tools Tumblr', {horizontalLayout: 'fitted'}));
     console.log('                                                             by YudaRmd\n');
 
-    await login(page,$options,email,password);
+    await login(page,$options,email,password).then(() => {console.log("Login Berhasil")}).catch(async(err) => {
+      console.log('Login Gagal');
+    });
 
     const lineCaption = new lineByLine(__dirname + '/tumblr/caption.txt');
 
@@ -32,8 +35,8 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
     while (line = dataBlasting.next()) {
       const lineString = line.toString();
       const data = lineString.split('|');
-      const title = data[0];
-      const img = data[1];
+      const img = data[0];
+      const title = data[1];
       const desc = data[2];
       const tag = data[3];
       await uploadPost(page,$options,title,img,caption,desc,tag);
@@ -113,46 +116,50 @@ const uploadPost = async(page,$options,title,img,caption,desc,tag) =>{
     await page.waitForTimeout(2000);
     await page.goto('https://www.tumblr.com/new/text',$options)
 
-    // await page.waitForTimeout(3000);
-    // await page.waitForSelector('div.editor.editor-plaintext');
-    // const btnTitle = await page.$('div.editor.editor-plaintext');
-    // await btnTitle.click();
-    // await btnTitle.dispose();
-    
-    // await page.waitForSelector('div > div > div > div > div.DraftEditor-editorContainer > div > div > div');
-    // const typeTitle = await page.$('div > div > div > div > div.DraftEditor-editorContainer > div > div > div');
-    // await typeTitle.type(title);
-    // await typeTitle.dispose();
     await page.waitForTimeout(2000);
+    await page.waitForSelector('#row-0 > div > div > div > div > div.DraftEditor-editorContainer > div > div > div > h1 > div');
+    const btnTitle = await page.$('#row-0 > div > div > div > div > div.DraftEditor-editorContainer > div > div > div > h1 > div');
+    await btnTitle.click();
+    await btnTitle.dispose();
 
-
+    await page.keyboard.type(title);
     
-    await page.waitForSelector('div.editor-wrapper > div > div.inline-controls > div.tray > div.control.add-image > input[type=file]');
+    await page.waitForSelector('#row-1 > div > div');
+    const clickDescription = await page.$('#row-1 > div > div');
+    await clickDescription.click();
+    await clickDescription.dispose();
+    
+    await clipboardy.write(desc + caption);
+
+    await page.waitForSelector('#row-1 > div > div > div > div.DR-8X > div._1RnRi > button._1F1cG._2SgM1._10_K8 > span > svg');
     const [fileChooser] = await Promise.all([
       page.waitForFileChooser(),
-      page.click('div.editor-wrapper > div > div.inline-controls > div.tray > div.control.add-image > input[type=file]')
+      page.click('#row-1 > div > div > div > div.DR-8X > div._1RnRi > button._1F1cG._2SgM1._10_K8 > span > svg')
     ]);
     
     await fileChooser.accept(['./tumblr/img/'+img]);
     
     await page.waitForTimeout(2000);
     
-    await page.keyboard.type(desc);
-    await page.waitForTimeout(2000);
-    await page.keyboard.type(caption);
+
+    await page.keyboard.down('Control');
+    await page.keyboard.press('V');
+    await page.keyboard.up('Control');
+
+    // await page.keyboard.type(desc);
+    // await page.waitForTimeout(2000);
+    // await page.keyboard.type(caption);
     
     // await page.waitForSelector('div > div > div > div.DR-8X > div.DraftEditor-root > div > div > div > div > div > span > p > div');
     // const typeDescCaption = await page.$('div > div > div > div.DR-8X > div.DraftEditor-root > div > div > div > div > div > span > p > div');
     // await typeDescCaption.type(desc + caption);
     // await typeDescCaption.dispose();
+    
     await page.waitForTimeout(2000);
     await page.waitForSelector('div._2UPya > div > span > span > textarea');
     const typeTag = await page.$('div._2UPya > div > span > span > textarea');
     await typeTag.type(tag);
     await typeTag.dispose();
-
-    await page.keyboard.press("Tab");
-    await page.keyboard.type(title);
 
     await page.waitForTimeout(2000);
     await page.waitForSelector('button._1F1cG.dE0It');
@@ -160,28 +167,31 @@ const uploadPost = async(page,$options,title,img,caption,desc,tag) =>{
     await btnPost.click();
     await btnPost.dispose();
 
-    const elementHandles = await page.$$('div._3hOxd > div._2YKZE > div.kW_rp > main > div._3quxC > div:nth-child(2) > div:nth-child(2) > div > div > article > header > a');
-    const propertyJsHandles = await Promise.all(
-      elementHandles.map(handle => handle.getProperty('href'))
-    );
+    // await page.waitForTimeout(4000);
+    // const elementHandles = await page.$$('#base-container > div._3hOxd > div._2YKZE > div.kW_rp > main > div._3quxC > div:nth-child(2) > div:nth-child(2) > div > div > article > header > a');
+    // const propertyJsHandles = await Promise.all(
+    //   elementHandles.map(handle => handle.getProperty('href'))
+    // );
 
-    const arrayLink = await Promise.all(
-      propertyJsHandles.map(handle => handle.jsonValue())
-    );
+    // const arrayLink = await Promise.all(
+    //   propertyJsHandles.map(handle => handle.jsonValue())
+    // );
     
-    let link = arrayLink.toString();
+    await page.waitForTimeout(3000);
+    const link = await page.evaluate(() => {
+      return document.querySelector('#base-container > div._3hOxd > div._2YKZE > div.kW_rp > main > div._3quxC > div:nth-child(2) > div:nth-child(2) > div > div > article > header > a').getAttribute('href'); 
+    });
+    
+    // let link = arrayLink.toString();
+    // console.log(link)
 
-    fs.appendFile(__dirname +'/tumblr/hasil.txt', link , err => {
+    await page.waitForTimeout(2000);
+    fs.appendFile(__dirname +'/tumblr/hasil.txt', link + '\n' , err => {
       if (err) {
         console.error(err);
         return
       }
     });
 
-    fs.appendFile(__dirname +'/tumblr/hasil.txt', '\n' , err => {
-      if (err) {
-        console.error(err);
-        return
-      }
-    });
+    await page.waitForTimeout(2000);
 }
