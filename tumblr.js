@@ -85,10 +85,10 @@ const inputLogin = async(page,$options,email,password) =>{
       await emailField.type(email);
       await emailField.dispose();
 
-  await page.waitForSelector('button[type="submit"]');
-  const nextButtonLogin = await page.$('button[type="submit"]');
-      await nextButtonLogin.click();
-      await nextButtonLogin.dispose();
+  // await page.waitForSelector('button[type="submit"]');
+  // const nextButtonLogin = await page.$('button[type="submit"]');
+  //     await nextButtonLogin.click();
+  //     await nextButtonLogin.dispose();
 
   await page.waitForSelector('input[name="password"]');
   const passwordField = await page.$('input[name="password"]');
@@ -131,10 +131,10 @@ const uploadPost = async(page,$options,title,img,caption,desc,tag) =>{
     
     await clipboardy.write(desc + caption);
 
-    await page.waitForSelector('#row-1 > div > div > div > div.DR-8X > div._1RnRi > button._1F1cG._2SgM1._10_K8 > span > svg');
+    await page.waitForSelector('#row-1 > div > div > div > div.ZsngG > div.Qx546 > button.xBRdB.n1k5T._8HM4 > span > svg');
     const [fileChooser] = await Promise.all([
       page.waitForFileChooser(),
-      page.click('#row-1 > div > div > div > div.DR-8X > div._1RnRi > button._1F1cG._2SgM1._10_K8 > span > svg')
+      page.click('#row-1 > div > div > div > div.ZsngG > div.Qx546 > button.xBRdB.n1k5T._8HM4 > span > svg')
     ]);
     
     await fileChooser.accept(['./tumblr/img/'+img]);
@@ -156,14 +156,14 @@ const uploadPost = async(page,$options,title,img,caption,desc,tag) =>{
     // await typeDescCaption.dispose();
     
     await page.waitForTimeout(2000);
-    await page.waitForSelector('div._2UPya > div > span > span > textarea');
-    const typeTag = await page.$('div._2UPya > div > span > span > textarea');
+    await page.waitForSelector('#base-container > div:nth-child(4) > div > div > div.U_kz4 > div._4LbU > div.f5amu > div > div.TB7ye > div > span > span > textarea');
+    const typeTag = await page.$('#base-container > div:nth-child(4) > div > div > div.U_kz4 > div._4LbU > div.f5amu > div > div.TB7ye > div > span > span > textarea');
     await typeTag.type(tag);
     await typeTag.dispose();
 
     await page.waitForTimeout(2000);
-    await page.waitForSelector('button._1F1cG.dE0It');
-    const btnPost = await page.$('button._1F1cG.dE0It');
+    await page.waitForSelector('#base-container > div:nth-child(4) > div > div > div.U_kz4 > div._4LbU > div.f5amu > div > div.ykbha > div > div > div > button > span');
+    const btnPost = await page.$('#base-container > div:nth-child(4) > div > div > div.U_kz4 > div._4LbU > div.f5amu > div > div.ykbha > div > div > div > button > span');
     await btnPost.click();
     await btnPost.dispose();
 
@@ -179,7 +179,7 @@ const uploadPost = async(page,$options,title,img,caption,desc,tag) =>{
     
     await page.waitForTimeout(3000);
     const link = await page.evaluate(() => {
-      return document.querySelector('#base-container > div._3hOxd > div._2YKZE > div.kW_rp > main > div._3quxC > div:nth-child(2) > div:nth-child(2) > div > div > article > header > a').getAttribute('href'); 
+      return document.querySelector('#base-container > div.PNArz > div.acReb > div.T5uZR > main > div.oLA3T > div:nth-child(2) > div:nth-child(2) > div > div > article > header > a').getAttribute('href'); 
     });
     
     // let link = arrayLink.toString();

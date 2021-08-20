@@ -8,7 +8,7 @@ const cookiesFilePath = __dirname+'/pinterest/cookies.json';
 const cookiesString = fs.readFileSync(cookiesFilePath);
 (async () => {
     const browser = await await puppeteer.launch({
-      //headless: false,
+      // headless: false,
       defaultViewport: null
     });
     const page = await browser.newPage();
@@ -130,8 +130,8 @@ const uploadPin = async(page,$options,img,title,caption,desc,link,category) =>{
     await fileChooser.accept(['./pinterest/img/'+img]);
     
     await page.waitForTimeout(2000);
-    await page.waitForSelector('textarea[placeholder="Add your title"]');
-    const addTitle = await page.$('textarea[placeholder="Add your title"]');
+    await page.waitForSelector('#__PWS_ROOT__ > div.App.AppBase > div.appContent > div > div > div > div.XiG.gpV.ujU.zI7.iyn.Hsu > div.XbT.zI7.iyn.Hsu > div > div > div > div.Jea.hs0.zI7.iyn.Hsu > div > div > div > div > div > div:nth-child(2) > div > div.l7T.ujU.zI7.iyn.Hsu > div > div:nth-child(1) > div.CDp.xcv.L4E.zI7.iyn.Hsu > div > div > div.XiG.xcv.L4E.zI7.iyn.Hsu > textarea');
+    const addTitle = await page.$('#__PWS_ROOT__ > div.App.AppBase > div.appContent > div > div > div > div.XiG.gpV.ujU.zI7.iyn.Hsu > div.XbT.zI7.iyn.Hsu > div > div > div > div.Jea.hs0.zI7.iyn.Hsu > div > div > div > div > div > div:nth-child(2) > div > div.l7T.ujU.zI7.iyn.Hsu > div > div:nth-child(1) > div.CDp.xcv.L4E.zI7.iyn.Hsu > div > div > div.XiG.xcv.L4E.zI7.iyn.Hsu > textarea');
     await addTitle.type(title,{delay:10});
     await addTitle.dispose();
 
