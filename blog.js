@@ -38,7 +38,6 @@ const cookiesStringWp = fs.readFileSync(cookiesFilePathWp);
       const lineString = line.toString();
       const data = lineString.split('|');
       const title = data[0];
-      const title = data[0];
       const linkArtikel = data[1];
       const label = data[2];
       const date = data[3];
@@ -174,8 +173,14 @@ const uploadArtikel = async(page,$options,title,linkArtikel,label,date,time,perm
   await page.setDefaultNavigationTimeout(0);
   await page.goto(linkArtikel,$options);
 
-  await page.waitForTimeout(1000);
-  await page.click('#tinymce');
+  await page.waitForSelector('#content-html');
+  const btnToText = await page.$('#content-html');
+      await btnToText.click();
+      await btnToText.dispose();
+
+  await page.waitForTimeout(5000);
+  await page.waitForSelector('#content');
+  await page.click('#content');
   await page.keyboard.down('Control');
   await page.keyboard.press('A');
   await page.keyboard.up('Control');
@@ -197,21 +202,22 @@ const uploadArtikel = async(page,$options,title,linkArtikel,label,date,time,perm
       await titleFiled.type(title);
       await titleFiled.dispose();
   
-  // await page.waitForSelector('c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.oqVKcb > div.hANwub > div.gw7PYd > div > div:nth-child(1) > div.ry3kXd.YuHtjc > div.MocG8c.m5D6Fd.LMgvRb.KKjvXb');
-  // const btnSwitchArticle = await page.$('c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.oqVKcb > div.hANwub > div.gw7PYd > div > div:nth-child(1) > div.ry3kXd.YuHtjc > div.MocG8c.m5D6Fd.LMgvRb.KKjvXb');
+  // await page.waitForSelector('#yDmH0d > c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.P8hSs.pEg5pc.CDANdb.ZsY9oc > div.Qy5T6b.O3LMFb.QduVPe > div.Wdqgzf > div.gw7PYd > div > div:nth-child(1) > div.ry3kXd.YuHtjc > div.MocG8c.m5D6Fd.LMgvRb.KKjvXb');
+  // const btnSwitchArticle = await page.$('#yDmH0d > c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.P8hSs.pEg5pc.CDANdb.ZsY9oc > div.Qy5T6b.O3LMFb.QduVPe > div.Wdqgzf > div.gw7PYd > div > div:nth-child(1) > div.ry3kXd.YuHtjc > div.MocG8c.m5D6Fd.LMgvRb.KKjvXb');
   //     await btnSwitchArticle.click();
   //     await btnSwitchArticle.dispose();
 
-  // await page.waitForSelector('c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.oqVKcb > div.hANwub > div.gw7PYd > div > div.OA0qNb.ncFHed.WYEltf > div.MocG8c.m5D6Fd.LMgvRb.KKjvXb');
-  // const btnSwitchHTML = await page.$('c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.oqVKcb > div.hANwub > div.gw7PYd > div > div.OA0qNb.ncFHed.WYEltf > div.MocG8c.m5D6Fd.LMgvRb.KKjvXb');
+  // await page.waitForSelector('#yDmH0d > c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.oqVKcb > div.hANwub > div.gw7PYd > div > div.OA0qNb.ncFHed.WYEltf > div.MocG8c.m5D6Fd.LMgvRb.KKjvXb');
+  // const btnSwitchHTML = await page.$('#yDmH0d > c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.oqVKcb > div.hANwub > div.gw7PYd > div > div.OA0qNb.ncFHed.WYEltf > div.MocG8c.m5D6Fd.LMgvRb.KKjvXb');
   //     await btnSwitchHTML.click();
   //     await btnSwitchHTML.dispose();
 
-  await page.waitForSelector('c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.QPhiZ > div > div > div > div.CodeMirror-scroll > div.CodeMirror-sizer > div > div > div > div.CodeMirror-code > div > pre');
-  const clickForWrite = await page.$('c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.QPhiZ > div > div > div > div.CodeMirror-scroll > div.CodeMirror-sizer > div > div > div > div.CodeMirror-code > div > pre');
+  await page.waitForSelector('#yDmH0d > c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.QPhiZ > div > div > div > div.CodeMirror-scroll');
+  const clickForWrite = await page.$('#yDmH0d > c-wiz:nth-child(16) > div > c-wiz > div > div.MJkged > div > div > div.y3IDJd.Fx3kmc.fmzcZd > span > div > div.CDANdb.fVFpRb.fH9kK > div.QPhiZ > div > div > div > div.CodeMirror-scroll');
       await clickForWrite.click();
       await clickForWrite.dispose();
       
+  await page.waitForTimeout(2000);
   await page.keyboard.down('Control');
   await page.keyboard.press('V');
   await page.keyboard.up('Control');
@@ -274,23 +280,24 @@ const uploadArtikel = async(page,$options,title,linkArtikel,label,date,time,perm
       await btnConfirm.click();
       await btnConfirm.dispose();
   
-  await page.waitForTimeout(1000);
-  await page.waitForSelector('c-wiz:nth-child(17) > div > c-wiz > c-wiz > div > div > div > div:nth-child(1) > div > span > div > div > div.jn15V');
-  const toArtikel = await page.$('c-wiz:nth-child(17) > div > c-wiz > c-wiz > div > div > div > div:nth-child(1) > div > span > div > div > div.jn15V');
-      await toArtikel.click();
-      await toArtikel.dispose();
+  // await page.waitForTimeout(1000);
+  // await page.waitForSelector('c-wiz:nth-child(17) > div > c-wiz > c-wiz > div > div > div > div:nth-child(1) > div > span > div > div > div.jn15V');
+  // const toArtikel = await page.$('c-wiz:nth-child(17) > div > c-wiz > c-wiz > div > div > div > div:nth-child(1) > div > span > div > div > div.jn15V');
+  //     await toArtikel.click();
+  //     await toArtikel.dispose();
   
-  await page.waitForTimeout(1000);
-  await page.waitForSelector('#c31 span > c-wiz > div > div.Ovbbsc > div:nth-child(3) > div');
-  const clickToPermalink = await page.$('#c31 span > c-wiz > div > div.Ovbbsc > div:nth-child(3) > div');
-      await clickToPermalink.click();
-      await clickToPermalink.dispose();
+  // await page.waitForTimeout(1000);
+  // await page.waitForSelector('#c29 > span > c-wiz > div > div.Ovbbsc > div:nth-child(3) > div > span > div');
+  // const clickToPermalink = await page.$('#c29 > span > c-wiz > div > div.Ovbbsc > div:nth-child(3) > div > span > div');
+  //     await clickToPermalink.click();
+  //     await clickToPermalink.dispose();
 
-  await page.waitForTimeout(2000);
-  const link = await page.evaluate(() => {
-    return document.querySelector("div.q6mdaf > span").textContent;
- });
-  fs.appendFile(__dirname +'/blog/hasil.txt', link, err => {
+//   await page.waitForTimeout(2000);
+//   const link = await page.evaluate(() => {
+//     return document.querySelector("div.q6mdaf > span").textContent;
+//  });
+  const content = "Artikel Berhasil : "+title;
+  fs.appendFile(__dirname +'/blog/hasil.txt', content , err => {
     if (err) {
       console.error(err);
       return

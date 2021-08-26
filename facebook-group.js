@@ -4,7 +4,7 @@ const lineByLine = require('n-readlines');
 const readlineSync = require('readline-sync');
 const figlet = require('figlet');
 
-const cookiesFilePath = __dirname+'/fanspage/cookies.json';
+const cookiesFilePath = __dirname+'/facebookGroup/cookies.json';
 const cookiesString = fs.readFileSync(cookiesFilePath);
 (async () => {
     const browser = await puppeteer.launch({
@@ -17,14 +17,14 @@ const cookiesString = fs.readFileSync(cookiesFilePath);
     var caption = '';
     var line;
     const $options = {waitUntil:'networkidle2'};
-    const dataBlasting = new lineByLine(__dirname + '/fanspage/dataBlasting.txt');
+    const dataBlasting = new lineByLine(__dirname + '/facebookGroup/dataBlasting.txt');
 
     console.log(figlet.textSync('Tools Facebook', {horizontalLayout: 'fitted'}));
     console.log('                                                                   by YudaRmd\n');
 
     await login(page,$options,email,password);
 
-    const lineCaption = new lineByLine(__dirname + '/fanspage/caption.txt');
+    const lineCaption = new lineByLine(__dirname + '/facebookGroup/caption.txt');
 
     while (captResult = lineCaption.next()) {
         caption += captResult.toString();
@@ -130,7 +130,7 @@ const uploadPost = async(page,$options,link,img,caption,desc,row) =>{
       page.click('div > div:nth-child(1) > div > div:nth-child(7) > div > div > div.rq0escxv.l9j0dhe7.du4w35lb > div > div.iqfcb0g7.tojvnm2t.a6sixzi8.k5wvi7nf.q3lfd5jv.pk4s997a.bipmatt0.cebpdrjk.qowsmv63.owwhemhu.dp1hu0rb.dhp61c6y.l9j0dhe7.iyyx5f41.a8s20v7p > div > div > div > form > div > div.rq0escxv.pmk7jnqg.du4w35lb.pedkr2u6.oqq733wu.ms05siws.pnx7fd3z.b7h9ocf4.j9ispegn.kr520xx4 > div > div.j83agx80.btwxx1t3 > div > div.ihqw7lf3.discj3wi.l9j0dhe7 > div.scb9dxdr.sj5x9vvc.dflh9lhu.cxgpxx05.dhix69tm.wkznzc2l.i1fnvgqd.j83agx80.rq0escxv.ibutc8p7.l82x9zwi.uo3d90p7.pw54ja7n.ue3kfks5.tr4kgdav.eip75gnj.ccnbzhu1.dwg5866k.cwj9ozl2.bp9cbjyn > div.j83agx80 > div:nth-child(2) > div > span > div > div > div:nth-child(1) > div > div > div.bp9cbjyn.j83agx80.datstx6m.taijpn5t.l9j0dhe7.k4urcfbm')
     ]);
     
-    await fileChooser.accept(['./fanspage/img/'+img]);
+    await fileChooser.accept(['./facebookGroup/img/'+img]);
 
     await page.waitForTimeout(5000);
     await page.waitForSelector('div > div:nth-child(1) > div > div:nth-child(7) > div > div > div.rq0escxv.l9j0dhe7.du4w35lb > div > div.iqfcb0g7.tojvnm2t.a6sixzi8.k5wvi7nf.q3lfd5jv.pk4s997a.bipmatt0.cebpdrjk.qowsmv63.owwhemhu.dp1hu0rb.dhp61c6y.l9j0dhe7.iyyx5f41.a8s20v7p > div > div > div > form > div > div.rq0escxv.pmk7jnqg.du4w35lb.pedkr2u6.oqq733wu.ms05siws.pnx7fd3z.b7h9ocf4.j9ispegn.kr520xx4 > div > div.j83agx80.btwxx1t3 > div > div.ihqw7lf3.discj3wi.l9j0dhe7 > div.k4urcfbm.dati1w0a.hv4rvrfc.i1fnvgqd.rq0escxv > div > div');
@@ -152,7 +152,7 @@ const uploadPost = async(page,$options,link,img,caption,desc,row) =>{
 
     await page.waitForTimeout(3000);
     const content = 'Baris '+row+' Sukses Di Upload\n';
-    fs.appendFile(__dirname +'/fanspage/hasil.txt', content, err => {
+    fs.appendFile(__dirname +'/facebookGroup/hasil.txt', content, err => {
       if (err) {
         console.error(err);
         return
