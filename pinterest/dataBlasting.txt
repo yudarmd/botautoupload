@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 1.jpg|coba|coba|dutasukses.com|coba
 2.jpg|coba|coba|dutasukses.com|coba
 3.jpg|coba|coba|dutasukses.com|coba
@@ -13,3 +14,5 @@
 4.jpg|coba|coba|dutasukses.com|coba
 4.jpg|coba|coba|dutasukses.com|coba
 4.jpg|coba|coba|dutasukses.com|coba
+=======
+>>>>>>> d8042d64afe9e3e2b7c58c9d097287cfc31a84ea
